@@ -95,4 +95,48 @@ describe("select", () => {
     expect(await screen.findByText("Beans")).toBeInTheDocument();
     expect(await screen.findByText("Donut")).toBeInTheDocument();
   });
+
+  it("filters options", async () => {
+    // Arrange
+    render(<Select options={options} />
+    );
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "i");
+
+    // Assert
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
+    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+  });
+
+  it("loads filtered options", async () => {
+    // Arrange
+    const promise = createPromiseController<Option[], unknown>();
+
+    render(<Select<Option, false, Group>
+      loadOptions={(inputValue: string) => new Promise(
+        (resolve) =>
+          promise.resolve = (options) => resolve(
+            options.filter(
+              o => o.label.toLowerCase().includes(inputValue)
+            )
+          )
+      )} />
+    );
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "i");
+
+    promise.resolve(options);
+
+    // Assert
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
+    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+  });
 });
