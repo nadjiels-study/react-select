@@ -3,32 +3,96 @@ import userEvent from "@testing-library/user-event";
 
 import Select from "@/lib/components/select";
 
+interface PromiseController<
+  R extends unknown,
+  E extends unknown
+> {
+  resolve: (res: R) => void;
+  reject: (err: E) => void;
+}
+
+interface Option {
+  label: string;
+  value: string;
+}
+
+interface Group {
+  label: string;
+  options: Option[];
+}
+
+function createPromiseController<
+  R extends unknown,
+  E extends unknown
+>(): PromiseController<R, E> {
+  return {
+    resolve: () => {},
+    reject: () => {},
+  }
+}
+
+function createOption(label: string, value?: string): Option {
+  return {
+    label,
+    value: value ?? label.trim().toLowerCase(),
+  }
+}
+
 const options = [
-  { label: "Risotto", value: "risotto" },
-  { label: "Sandwich", value: "sandwich" },
-  { label: "Rice", value: "rice" },
-  { label: "Beans", value: "beans" },
-  { label: "Donut", value: "donut" },
+  createOption("Risotto"),
+  createOption("Sandwich"),
+  createOption("Rice"),
+  createOption("Beans"),
+  createOption("Donut"),
 ];
 
 describe("select", () => {
   it("shows empty text", async () => {
+    // Arrange
     render(<Select />);
 
+    // Act
     await userEvent.click(screen.getByRole("combobox"));
 
+    // Assert
     expect(await screen.findByText(/No options/i)).toBeInTheDocument();
   });
 
   it("shows options", async () => {
+    // Arrange
     render(<Select options={options} />);
 
+    // Act
     await userEvent.click(screen.getByRole("combobox"));
 
-    expect(await screen.findByText(/Risotto/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Sandwich/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Rice/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Beans/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Donut/i)).toBeInTheDocument();
+    // Assert
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
+  });
+
+  it("loads options", async () => {
+    // Arrange
+    const promise = createPromiseController<Option[], unknown>();
+
+    render(<Select<Option, false, Group>
+      loadOptions={() => new Promise(
+        (resolve) => promise.resolve = resolve
+      )} />
+    );
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+
+    promise.resolve(options);
+
+    // Assert
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
   });
 });
