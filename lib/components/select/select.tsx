@@ -1,6 +1,7 @@
 "use client";
 
 import AsyncCreatableSelect from "react-select/async-creatable";
+import search from "@/lib/util/search";
 
 import { isLabelledOption, type Props } from "./types";
 import type { GroupBase } from "react-select";
@@ -25,9 +26,7 @@ export default function Select<
 
   const defaultLoadOptions = async (inputValue: string) =>
     (options ?? []).filter(
-      o => isLabelledOption(o)
-        ? o.label.toLowerCase().includes(inputValue.toLowerCase())
-        : true
+      o => isLabelledOption(o) ? search(o.label, inputValue) : true
     );
   
   const wrapperLoadOptions: P["loadOptions"] = loadOptions ?? defaultLoadOptions;

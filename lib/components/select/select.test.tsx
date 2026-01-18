@@ -263,7 +263,7 @@ describe("select", () => {
     );
 
     // Act
-    await userEvent.click(screen.getByRole("combobox"));
+    await userEvent.type(screen.getByRole("combobox"), "s");
     
     // Assert
     expect(await screen.findByText("Salame")).toBeInTheDocument();
