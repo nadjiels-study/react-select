@@ -186,4 +186,32 @@ describe("select", () => {
     expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
     expect(screen.queryByText("Donut")).not.toBeInTheDocument();
   });
+
+  it("rejects creatability", async () => {
+    // Arrange
+    render(<Select
+      isValidNewOption={(inputValue: string) =>
+        inputValue.trim().length >= 3}
+    />);
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "L");
+    
+    // Assert
+    expect(screen.queryByText(/Create/i)).not.toBeInTheDocument();
+  });
+
+  it("approves creatability", async () => {
+    // Arrange
+    render(<Select
+      isValidNewOption={(inputValue: string) =>
+        inputValue.trim().length >= 3}
+    />);
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "Lasagna");
+    
+    // Assert
+    expect(await screen.findByText(/Create/i)).toBeInTheDocument();
+  });
 });
