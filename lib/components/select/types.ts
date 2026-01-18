@@ -15,7 +15,7 @@ export interface Props<
   IsMulti extends boolean,
   Group extends GroupBase<Option>,
 > extends AsyncCreatableProps<Option, IsMulti, Group> {
-
+  creatable?: boolean;
 }
 
 export function isLabelledOption<

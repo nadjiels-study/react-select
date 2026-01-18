@@ -1,3 +1,5 @@
+"use client";
+
 import Select from "@/lib/components/select";
 
 const options = [
@@ -10,6 +12,11 @@ const options = [
 
 export default function Home() {
   return (
-    <Select options={options} />
+    <Select
+      options={options}
+      formatCreateLabel={() => <></>}
+      creatable={false}
+      onMenuClose={() => {}}
+    />
   );
 }

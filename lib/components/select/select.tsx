@@ -1,6 +1,7 @@
 "use client";
 
 import AsyncCreatableSelect from "react-select/async-creatable";
+import AsyncSelect from "react-select/async";
 
 import { isLabelledOption, type Props } from "./types";
 import type { GroupBase } from "react-select";
@@ -11,6 +12,7 @@ export default function Select<
   Group extends GroupBase<Option>,
 >({
   options,
+  creatable = true,
   ...props
 }: Props<Option, IsMulti, Group>) {
   const loadOptions = async (inputValue: string) => (options ?? []).filter(
@@ -19,9 +21,19 @@ export default function Select<
       : true
   );
 
-  return <AsyncCreatableSelect
-    loadOptions={loadOptions}
-    defaultOptions
-    {...props}
-  />;
+  function renderSelect() {
+    return creatable
+      ? <AsyncCreatableSelect
+        loadOptions={loadOptions}
+        defaultOptions
+        {...props}
+      />
+      : <AsyncSelect
+        loadOptions={loadOptions}
+        defaultOptions
+        {...props}
+      />
+  }
+
+  return renderSelect();
 }

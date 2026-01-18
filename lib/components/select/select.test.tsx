@@ -139,4 +139,26 @@ describe("select", () => {
     expect(screen.queryByText("Beans")).not.toBeInTheDocument();
     expect(screen.queryByText("Donut")).not.toBeInTheDocument();
   });
+
+  it("is creatable", async () => {
+    // Arrange
+    render(<Select />);
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "A");
+
+    // Assert
+    expect(await screen.findByText(/Create/i)).toBeInTheDocument();
+  });
+
+  it("is not creatable", async () => {
+    // Arrange
+    render(<Select creatable={false} />);
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "A");
+
+    // Assert
+    expect(screen.queryByText(/Create/i)).not.toBeInTheDocument();
+  });
 });
