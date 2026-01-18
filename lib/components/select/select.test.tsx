@@ -161,4 +161,29 @@ describe("select", () => {
     // Assert
     expect(screen.queryByText(/Create/i)).not.toBeInTheDocument();
   });
+
+  it("keeps state between creatable change", async () => {
+    // Arrange
+    const { rerender } = render(<Select options={options} />);
+
+    await userEvent.type(screen.getByRole("combobox"), "A");
+
+    // Act
+    expect(await screen.findByText(/Create/i)).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
+    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
+    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+
+    rerender(<Select options={options} creatable={false} />)
+    
+    // Assert
+    expect(screen.queryByText(/Create/i)).not.toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
+    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
+    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+  });
 });
