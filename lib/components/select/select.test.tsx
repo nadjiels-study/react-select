@@ -214,4 +214,19 @@ describe("select", () => {
     // Assert
     expect(await screen.findByText(/Create/i)).toBeInTheDocument();
   });
+
+  it("allows no defaultOptions", async () => {
+    // Arrange
+    render(<Select options={options} defaultOptions={false}/>);
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+    
+    // Assert
+    expect(screen.queryByText("Sandwich")).not.toBeInTheDocument();
+    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
+    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
+    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
+    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+  });
 });

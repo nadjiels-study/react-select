@@ -16,6 +16,7 @@ export default function Select<
 >({
   options,
   creatable = true,
+  defaultOptions = true,
   isValidNewOption,
   loadOptions,
   ...props
@@ -42,6 +43,6 @@ export default function Select<
     {...props}
     loadOptions={wrapperLoadOptions}
     isValidNewOption={wrapperIsValidNewOption}
-    defaultOptions
+    defaultOptions={defaultOptions}
   />;
 }
