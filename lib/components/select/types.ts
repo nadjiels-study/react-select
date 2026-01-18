@@ -10,6 +10,16 @@ interface LabelledOption {
   label: string;
 }
 
+export interface DefaultOption {
+  label: string;
+  value: string;
+}
+
+export interface DefaultGroup {
+  label: string;
+  options: DefaultOption[];
+}
+
 export interface Props<
   Option,
   IsMulti extends boolean,

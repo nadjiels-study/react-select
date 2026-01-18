@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import Select from "@/lib/components/select";
+import { createOption } from "./lib";
+import type { DefaultOption, DefaultGroup } from "./types";
 
 interface PromiseController<
   R extends unknown,
@@ -9,16 +11,6 @@ interface PromiseController<
 > {
   resolve: (res: R) => void;
   reject: (err: E) => void;
-}
-
-interface Option {
-  label: string;
-  value: string;
-}
-
-interface Group {
-  label: string;
-  options: Option[];
 }
 
 function createPromiseController<
@@ -31,13 +23,6 @@ function createPromiseController<
   }
 }
 
-function createOption(label: string, value?: string): Option {
-  return {
-    label,
-    value: value ?? label.trim().toLowerCase(),
-  }
-}
-
 const options = [
   createOption("Risotto"),
   createOption("Sandwich"),
@@ -45,6 +30,12 @@ const options = [
   createOption("Beans"),
   createOption("Donut"),
 ];
+
+const defaultOptions = [
+  createOption("Salame"),
+  createOption("Sandwich"),
+  createOption("Mushroom Stew"),
+]
 
 describe("select", () => {
   it("shows empty text", async () => {
@@ -75,9 +66,9 @@ describe("select", () => {
 
   it("loads options", async () => {
     // Arrange
-    const promise = createPromiseController<Option[], unknown>();
+    const promise = createPromiseController<DefaultOption[], unknown>();
 
-    render(<Select<Option, false, Group>
+    render(<Select<DefaultOption, false, DefaultGroup>
       loadOptions={() => new Promise(
         (resolve) => promise.resolve = resolve
       )} />
@@ -114,9 +105,9 @@ describe("select", () => {
 
   it("loads filtered options", async () => {
     // Arrange
-    const promise = createPromiseController<Option[], unknown>();
+    const promise = createPromiseController<DefaultOption[], unknown>();
 
-    render(<Select<Option, false, Group>
+    render(<Select<DefaultOption, false, DefaultGroup>
       loadOptions={(inputValue: string) => new Promise(
         (resolve) =>
           promise.resolve = (options) => resolve(
@@ -217,7 +208,7 @@ describe("select", () => {
 
   it("allows no defaultOptions", async () => {
     // Arrange
-    render(<Select options={options} defaultOptions={false}/>);
+    render(<Select options={options} defaultOptions={false} />);
 
     // Act
     await userEvent.click(screen.getByRole("combobox"));
@@ -228,5 +219,69 @@ describe("select", () => {
     expect(screen.queryByText("Rice")).not.toBeInTheDocument();
     expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
     expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+  });
+
+  it("shows defaultOptions", async () => {
+    // Arrange
+    render(<Select defaultOptions={defaultOptions} />);
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+    
+    // Assert
+    expect(await screen.findByText("Salame")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Mushroom Stew")).toBeInTheDocument();
+  });
+
+  it("shows options over defaultOptions", async () => {
+    // Arrange
+    render(<Select options={options} defaultOptions={defaultOptions} />);
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+    
+    // Assert
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
+  });
+
+  it("shows defaultOptions while options load", async () => {
+    // Arrange
+    const promise = createPromiseController<DefaultOption[], unknown>();
+
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={() => new Promise(
+          (resolve) => promise.resolve = resolve
+        )}
+        defaultOptions={defaultOptions}
+      />
+    );
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+    
+    // Assert
+    expect(await screen.findByText("Salame")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Mushroom Stew")).toBeInTheDocument();
+    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
+    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
+    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
+    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+
+    promise.resolve(options);
+    
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
+    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
   });
 });

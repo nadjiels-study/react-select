@@ -43,6 +43,6 @@ export default function Select<
     {...props}
     loadOptions={wrapperLoadOptions}
     isValidNewOption={wrapperIsValidNewOption}
-    defaultOptions={defaultOptions}
+    defaultOptions={options && defaultOptions ? true : defaultOptions}
   />;
 }
