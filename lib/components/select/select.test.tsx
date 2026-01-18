@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import Select from "@/lib/components/select";
 import { createOption } from "./lib";
+import search from "@/lib/util/search";
 import type { DefaultOption, DefaultGroup } from "./types";
 
 interface PromiseController<
@@ -111,9 +112,7 @@ describe("select", () => {
       loadOptions={(inputValue: string) => new Promise(
         (resolve) =>
           promise.resolve = (options) => resolve(
-            options.filter(
-              o => o.label.toLowerCase().includes(inputValue)
-            )
+            options.filter(o => search(o.label, inputValue))
           )
       )} />
     );
@@ -206,9 +205,47 @@ describe("select", () => {
     expect(await screen.findByText(/Create/i)).toBeInTheDocument();
   });
 
-  it("allows no defaultOptions", async () => {
+  it("shows defaultOptions while autoloads", async () => {
     // Arrange
-    render(<Select options={options} defaultOptions={false} />);
+    const promise = createPromiseController<DefaultOption[], unknown>();
+
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={() => new Promise(
+          (resolve) => promise.resolve = resolve
+        )}
+        defaultOptions={defaultOptions}
+      />
+    );
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+    
+    // Assert
+    expect(await screen.findByText("Salame")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Mushroom Stew")).toBeInTheDocument();
+
+    promise.resolve(options);
+
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
+    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
+  });
+
+  it("allows no autoloading", async () => {
+    // Arrange
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={() => Promise.resolve(options)}
+        filterOption={() => true}
+        autoload={false}
+      />
+    );
 
     // Act
     await userEvent.click(screen.getByRole("combobox"));
@@ -219,6 +256,14 @@ describe("select", () => {
     expect(screen.queryByText("Rice")).not.toBeInTheDocument();
     expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
     expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    
+    await userEvent.type(screen.getByRole("combobox"), "i");
+    
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
   });
 
   it("shows defaultOptions", async () => {
@@ -247,6 +292,8 @@ describe("select", () => {
     expect(await screen.findByText("Rice")).toBeInTheDocument();
     expect(await screen.findByText("Risotto")).toBeInTheDocument();
     expect(await screen.findByText("Donut")).toBeInTheDocument();
+    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
   });
 
   it("shows defaultOptions while options load", async () => {
@@ -263,7 +310,7 @@ describe("select", () => {
     );
 
     // Act
-    await userEvent.type(screen.getByRole("combobox"), "s");
+    await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
     expect(await screen.findByText("Salame")).toBeInTheDocument();
@@ -280,6 +327,28 @@ describe("select", () => {
     expect(await screen.findByText("Beans")).toBeInTheDocument();
     expect(await screen.findByText("Rice")).toBeInTheDocument();
     expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Donut")).toBeInTheDocument();
+    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
+  });
+
+  it("loads options despite default options", async () => {
+    // Arrange
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={() => Promise.resolve(options)}
+        defaultOptions={defaultOptions}
+      />
+    );
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+    
+    // Assert
+    expect(await screen.findByText("Risotto")).toBeInTheDocument();
+    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
+    expect(await screen.findByText("Rice")).toBeInTheDocument();
+    expect(await screen.findByText("Beans")).toBeInTheDocument();
     expect(await screen.findByText("Donut")).toBeInTheDocument();
     expect(screen.queryByText("Salame")).not.toBeInTheDocument();
     expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();

@@ -1,4 +1,4 @@
-import type { AsyncCreatableProps } from "react-select/async-creatable";
+import type { CreatableProps } from "react-select/creatable";
 import type { GroupBase, OptionsOrGroups } from "react-select";
 
 type OptionOrGroup<
@@ -20,12 +20,20 @@ export interface DefaultGroup {
   options: DefaultOption[];
 }
 
+export type LoadOptions<Option, Group extends GroupBase<Option>> = (
+  inputValue: string,
+  callback: (options: OptionsOrGroups<Option, Group>) => void,
+) => void | Promise<OptionsOrGroups<Option, Group>>
+
 export interface Props<
   Option,
   IsMulti extends boolean,
   Group extends GroupBase<Option>,
-> extends AsyncCreatableProps<Option, IsMulti, Group> {
+> extends CreatableProps<Option, IsMulti, Group> {
   creatable?: boolean;
+  defaultOptions?: OptionsOrGroups<Option, Group>;
+  autoload?: boolean;
+  loadOptions?: LoadOptions<Option, Group>;
 }
 
 export function isLabelledOption<

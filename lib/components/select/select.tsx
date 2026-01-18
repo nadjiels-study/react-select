@@ -1,11 +1,16 @@
 "use client";
 
-import AsyncCreatableSelect from "react-select/async-creatable";
+import CreatableSelect from "react-select/creatable";
+import { useCallback, useState, useEffect } from "react";
 import search from "@/lib/util/search";
 
 import { isLabelledOption, type Props } from "./types";
-import type { GroupBase } from "react-select";
+import type { GroupBase, FilterOptionOption } from "react-select";
 
+/**
+ * Allows new option creation when the input
+ * actually has some content.
+ */
 function defaultIsValidNewOption(inputValue: string) {
   return inputValue.trim().length > 0;
 }
@@ -15,21 +20,45 @@ export default function Select<
   IsMulti extends boolean,
   Group extends GroupBase<Option>,
 >({
-  options,
+  options: propOptions,
   creatable = true,
-  defaultOptions = true,
+  defaultOptions: propDefaultOptions,
   isValidNewOption,
   loadOptions,
+  autoload = true,
+  filterOption,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
 
-  const defaultLoadOptions = async (inputValue: string) =>
-    (options ?? []).filter(
-      o => isLabelledOption(o) ? search(o.label, inputValue) : true
-    );
+  const [defaultOptions, setDefaultOptions] = useState(propDefaultOptions);
+  const [options, setOptions] = useState(propOptions);
+
+  useEffect(() => {
+    if(!options?.length) setOptions(defaultOptions);
+    if(autoload) wrapperLoadOptions("");
+  }, []);
   
-  const wrapperLoadOptions: P["loadOptions"] = loadOptions ?? defaultLoadOptions;
+  const defaultFilterOption = useCallback(
+    (option: FilterOptionOption<Option>, inputValue: string) =>
+      isLabelledOption(option) ? search(option.label, inputValue) : true,
+    [options]
+  );
+
+  const wrapperLoadOptions = (inputValue: string) => {
+    if(loadOptions) {
+      loadOptions(inputValue, setOptions)?.then(setOptions);
+    }
+  }
+
+  const defaultOnInputChange = (newValue: string) => {
+    wrapperLoadOptions(newValue);
+  }
+  
+  /**
+   * Automatically enables creation when `creatable` is `true`,
+   * unless `isValidNewOption` tells otherwise. Else, disables it.
+   */
   const wrapperIsValidNewOption: P["isValidNewOption"] = (
     inputValue, value, options, accessors
   ) =>
@@ -38,10 +67,11 @@ export default function Select<
       ?? defaultIsValidNewOption(inputValue)
     );
 
-  return <AsyncCreatableSelect
+  return <CreatableSelect
     {...props}
-    loadOptions={wrapperLoadOptions}
+    options={options}
+    filterOption={filterOption ?? defaultFilterOption}
     isValidNewOption={wrapperIsValidNewOption}
-    defaultOptions={options && defaultOptions ? true : defaultOptions}
+    onInputChange={defaultOnInputChange}
   />;
 }
