@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import Select from "@/lib/components/select";
@@ -418,5 +418,56 @@ describe("select", () => {
     options
       .filter(o => ["Salame", "Mushroom Stew"].includes(o.label))
       .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
+  });
+
+  it("indicates autoloading", async () => {
+    // Arrange
+    const promise = createPromiseController<DefaultOption[], unknown>();
+
+    // Act
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={() => new Promise((resolve) => promise.resolve = resolve)}
+        autoload
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+    
+    // Assert
+    const loadingIndicator = await screen.findByText("Loading");
+
+    expect(loadingIndicator).toBeInTheDocument();
+
+    promise.resolve(options);
+    
+    await waitForElementToBeRemoved(loadingIndicator);
+
+    expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+  });
+
+  it("doesn't load on close", async () => {
+    // Arrange
+    const loadOptions = vi.fn();
+
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={loadOptions}
+        autoload={false}
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+
+    const select = screen.getByRole("combobox")
+
+    // Act
+    await userEvent.click(select);
+    await userEvent.click(document.body);
+    
+    // Assert
+    expect(loadOptions).not.toBeCalled();
   });
 });

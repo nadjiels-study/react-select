@@ -27,12 +27,14 @@ export default function Select<
   loadOptions,
   autoload = true,
   filterOption,
+  isLoading: propIsLoading = false,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
 
   const [defaultOptions, setDefaultOptions] = useState(propDefaultOptions);
   const [options, setOptions] = useState(propOptions);
+  const [isLoading, setIsLoading] = useState(propIsLoading);
 
   useEffect(() => {
     if(!options?.length) setOptions(defaultOptions);
@@ -45,12 +47,18 @@ export default function Select<
   ) => isLabelledOption(option) ? search(option.label, inputValue) : true;
 
   const wrapperLoadOptions = (inputValue: string) => {
-    if(loadOptions) {
-      loadOptions(inputValue, setOptions)?.then(setOptions);
-    }
+    if(!loadOptions) return;
+
+    setIsLoading(true);
+
+    loadOptions(inputValue, setOptions)
+      ?.then(setOptions)
+      .finally(() => setIsLoading(false));
   }
 
-  const defaultOnInputChange = (newValue: string) => {
+  const defaultOnInputChange: P["onInputChange"] = (newValue, actionMeta) => {
+    if(actionMeta.action !== "input-change") return;
+    
     wrapperLoadOptions(newValue);
   }
   
@@ -72,5 +80,6 @@ export default function Select<
     filterOption={filterOption ?? defaultFilterOption}
     isValidNewOption={wrapperIsValidNewOption}
     onInputChange={defaultOnInputChange}
+    isLoading={isLoading}
   />;
 }
