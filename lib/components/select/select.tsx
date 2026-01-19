@@ -1,11 +1,11 @@
 "use client";
 
 import CreatableSelect from "react-select/creatable";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import search from "@/lib/util/search";
 
 import { isLabelledOption, type Props } from "./types";
-import type { GroupBase, FilterOptionOption } from "react-select";
+import type { GroupBase, FilterOptionOption, OptionsOrGroups } from "react-select";
 
 /**
  * Allows new option creation when the input
@@ -22,23 +22,27 @@ export default function Select<
 >({
   options: propOptions,
   creatable = true,
-  defaultOptions: propDefaultOptions,
+  defaultOptions,
   isValidNewOption,
   loadOptions,
   autoload = true,
   filterOption,
   isLoading: propIsLoading = false,
+  cacheOptions = true,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
+  
+  const cache = useRef(new Map<string, OptionsOrGroups<Option, Group>>());
 
-  const [defaultOptions, setDefaultOptions] = useState(propDefaultOptions);
-  const [options, setOptions] = useState(propOptions);
+  const initialOptions = propOptions?.length ? propOptions : defaultOptions;
+
+  const [options, setOptions] = useState(initialOptions);
   const [isLoading, setIsLoading] = useState(propIsLoading);
 
   useEffect(() => {
-    if(!options?.length) setOptions(defaultOptions);
     if(autoload) wrapperLoadOptions("");
+    else if(cacheOptions) cache.current.set("", options ?? []);
   }, []);
   
   const defaultFilterOption = (
@@ -49,10 +53,20 @@ export default function Select<
   const wrapperLoadOptions = (inputValue: string) => {
     if(!loadOptions) return;
 
+    if(cacheOptions && cache.current.has(inputValue)) {
+      return setOptions(cache.current.get(inputValue));
+    }
+
     setIsLoading(true);
 
-    loadOptions(inputValue, setOptions)
-      ?.then(setOptions)
+    const updateOptions = (options: OptionsOrGroups<Option, Group>) => {
+      setOptions(options);
+
+      if(cacheOptions) cache.current.set(inputValue, options);
+    }
+
+    loadOptions(inputValue, updateOptions)
+      ?.then(updateOptions)
       .finally(() => setIsLoading(false));
   }
 
@@ -73,6 +87,10 @@ export default function Select<
       isValidNewOption?.(inputValue, value, options, accessors)
       ?? defaultIsValidNewOption(inputValue)
     );
+  
+  const onMenuClose = () => {
+    setOptions(initialOptions);
+  }
 
   return <CreatableSelect
     {...props}
@@ -81,5 +99,6 @@ export default function Select<
     isValidNewOption={wrapperIsValidNewOption}
     onInputChange={defaultOnInputChange}
     isLoading={isLoading}
+    onMenuClose={onMenuClose}
   />;
 }
