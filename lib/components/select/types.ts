@@ -34,6 +34,8 @@ export interface Props<
   defaultOptions?: OptionsOrGroups<Option, Group>;
   autoload?: boolean;
   loadOptions?: LoadOptions<Option, Group>;
+  cacheOptions?: boolean;
+  uncacheOnCreate?: boolean;
 }
 
 export function isLabelledOption<

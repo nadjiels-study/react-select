@@ -4,7 +4,7 @@ import CreatableSelect from "react-select/creatable";
 import { useState, useEffect, useRef } from "react";
 import search from "@/lib/util/search";
 
-import { isLabelledOption, type Props } from "./types";
+import { type Props } from "./types";
 import type { GroupBase, FilterOptionOption, OptionsOrGroups } from "react-select";
 
 /**
@@ -27,8 +27,10 @@ export default function Select<
   loadOptions,
   autoload = true,
   filterOption,
-  isLoading: propIsLoading = false,
+  isLoading: propIsLoading,
   cacheOptions = true,
+  uncacheOnCreate = true,
+  onCreateOption,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
@@ -38,7 +40,7 @@ export default function Select<
   const initialOptions = propOptions?.length ? propOptions : defaultOptions;
 
   const [options, setOptions] = useState(initialOptions);
-  const [isLoading, setIsLoading] = useState(propIsLoading);
+  const [isLoading, setIsLoading] = useState(propIsLoading ?? false);
 
   useEffect(() => {
     if(autoload) wrapperLoadOptions("");
@@ -48,7 +50,7 @@ export default function Select<
   const defaultFilterOption = (
     option: FilterOptionOption<Option>,
     inputValue: string
-  ) => isLabelledOption(option) ? search(option.label, inputValue) : true;
+  ) => search(option.label, inputValue);
 
   const wrapperLoadOptions = (inputValue: string) => {
     if(!loadOptions) return;
@@ -57,7 +59,7 @@ export default function Select<
       return setOptions(cache.current.get(inputValue));
     }
 
-    setIsLoading(true);
+    if(propIsLoading === undefined) setIsLoading(true);
 
     const updateOptions = (options: OptionsOrGroups<Option, Group>) => {
       setOptions(options);
@@ -67,7 +69,9 @@ export default function Select<
 
     loadOptions(inputValue, updateOptions)
       ?.then(updateOptions)
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        if(propIsLoading === undefined) setIsLoading(false)
+      });
   }
 
   const defaultOnInputChange: P["onInputChange"] = (newValue, actionMeta) => {
@@ -92,6 +96,12 @@ export default function Select<
     setOptions(initialOptions);
   }
 
+  const wrapperOnCreateOption = (inputValue: string) => {
+    if(uncacheOnCreate) cache.current.clear();
+
+    onCreateOption?.(inputValue);
+  }
+
   return <CreatableSelect
     {...props}
     options={options}
@@ -100,5 +110,6 @@ export default function Select<
     onInputChange={defaultOnInputChange}
     isLoading={isLoading}
     onMenuClose={onMenuClose}
+    onCreateOption={wrapperOnCreateOption}
   />;
 }
