@@ -470,4 +470,27 @@ describe("select", () => {
     // Assert
     expect(loadOptions).not.toBeCalled();
   });
+
+  it("updates options on menu open", async () => {
+    // Arrange
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={inputValue => Promise.resolve(
+          options.filter(o => search(o.label, inputValue))
+        )}
+        filterOption={() => true}
+        autoload={false}
+      />
+    );
+
+    const select = screen.getByRole("combobox")
+
+    // Act
+    await userEvent.type(select, "d");
+    await userEvent.click(document.body);
+    await userEvent.click(select);
+    
+    // Assert
+    expect(await screen.findByText(/No options/i)).toBeInTheDocument();
+  });
 });
