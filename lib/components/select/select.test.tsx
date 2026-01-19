@@ -471,7 +471,7 @@ describe("select", () => {
     expect(loadOptions).not.toBeCalled();
   });
 
-  it("updates options on menu open", async () => {
+  it("resets options on menu close", async () => {
     // Arrange
     render(
       <Select<DefaultOption, false, DefaultGroup>
