@@ -6,18 +6,12 @@ import { createOption } from "./lib";
 import search from "@/lib/util/search";
 import type { DefaultOption, DefaultGroup } from "./types";
 
-interface PromiseController<
-  R extends unknown,
-  E extends unknown
-> {
+interface PromiseController<R, E> {
   resolve: (res: R) => void;
   reject: (err: E) => void;
 }
 
-function createPromiseController<
-  R extends unknown,
-  E extends unknown
->(): PromiseController<R, E> {
+function createPromiseController<R, E>(): PromiseController<R, E> {
   return {
     resolve: () => {},
     reject: () => {},
@@ -58,81 +52,136 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
 
     // Assert
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
+    await Promise.all(options.map(
+      async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
   });
 
   it("loads options", async () => {
     // Arrange
-    const promise = createPromiseController<DefaultOption[], unknown>();
-
-    render(<Select<DefaultOption, false, DefaultGroup>
-      loadOptions={() => new Promise(
-        (resolve) => promise.resolve = resolve
-      )} />
+    render(
+      <Select loadOptions={() => Promise.resolve(options)} />
     );
 
     // Act
     await userEvent.click(screen.getByRole("combobox"));
 
-    promise.resolve(options);
+    // Assert
+    await Promise.all(options.map(
+      async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+  });
+
+  it("filters options by default", async () => {
+    // Arrange
+    render(<Select options={options} />);
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "i");
 
     // Assert
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Risotto", "Sandwich", "Rice"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Beans", "Donut"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 
   it("filters options", async () => {
     // Arrange
-    render(<Select options={options} />
+    render(
+      <Select
+        options={options}
+        filterOption={(option, inputValue) => !search(option.label, inputValue)}
+      />
     );
 
     // Act
     await userEvent.type(screen.getByRole("combobox"), "i");
 
     // Assert
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
-    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Beans", "Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Risotto", "Sandwich", "Rice"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 
   it("loads filtered options", async () => {
     // Arrange
-    const promise = createPromiseController<DefaultOption[], unknown>();
-
-    render(<Select<DefaultOption, false, DefaultGroup>
-      loadOptions={(inputValue: string) => new Promise(
-        (resolve) =>
-          promise.resolve = (options) => resolve(
-            options.filter(o => search(o.label, inputValue))
-          )
-      )} />
+    render(
+      <Select
+        loadOptions={(inputValue: string) => Promise.resolve(
+          options.filter(o => search(o.label, inputValue))
+        )}
+        filterOption={() => true}
+      />
     );
 
     // Act
     await userEvent.type(screen.getByRole("combobox"), "i");
 
-    promise.resolve(options);
+    // Assert
+    await Promise.all(
+      options
+        .filter(o => ["Risotto", "Sandwich", "Rice"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Beans", "Donut"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
+  });
+
+  it("filters loaded options", async () => {
+    // Arrange
+    render(
+      <Select
+        loadOptions={(inputValue: string) => Promise.resolve(
+          options.filter(o => search(o.label, inputValue))
+        )}
+        filterOption={
+          (option, inputValue) =>
+            option.label
+              .toLocaleLowerCase()
+              .startsWith(inputValue.toLocaleLowerCase())
+        }
+      />
+    );
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "d");
 
     // Assert
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
-    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Beans", "Risotto", "Sandwich", "Rice"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
+  });
+
+  it("is creatable by default", async () => {
+    // Arrange
+    render(<Select />);
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "A");
+
+    // Assert
+    expect(await screen.findByText(/Create/i)).toBeInTheDocument();
   });
 
   it("is creatable", async () => {
     // Arrange
-    render(<Select />);
+    render(<Select creatable />);
 
     // Act
     await userEvent.type(screen.getByRole("combobox"), "A");
@@ -154,35 +203,44 @@ describe("select", () => {
 
   it("keeps state between creatable change", async () => {
     // Arrange
-    const { rerender } = render(<Select options={options} />);
+    const { rerender } = render(<Select options={options} creatable />);
 
     await userEvent.type(screen.getByRole("combobox"), "A");
 
     // Act
     expect(await screen.findByText(/Create/i)).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
-    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
-    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Risotto", "Donut", "Rice"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
 
     rerender(<Select options={options} creatable={false} />)
     
     // Assert
     expect(screen.queryByText(/Create/i)).not.toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
-    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
-    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Risotto", "Donut", "Rice"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 
   it("rejects creatability", async () => {
     // Arrange
-    render(<Select
-      isValidNewOption={(inputValue: string) =>
-        inputValue.trim().length >= 3}
-    />);
+    render(
+      <Select
+        isValidNewOption={
+          (inputValue) => inputValue.trim().length >= 3
+        }
+      />
+    );
 
     // Act
     await userEvent.type(screen.getByRole("combobox"), "L");
@@ -193,10 +251,13 @@ describe("select", () => {
 
   it("approves creatability", async () => {
     // Arrange
-    render(<Select
-      isValidNewOption={(inputValue: string) =>
-        inputValue.trim().length >= 3}
-    />);
+    render(
+      <Select
+        isValidNewOption={
+          (inputValue) => inputValue.trim().length >= 3
+        }
+      />
+    );
 
     // Act
     await userEvent.type(screen.getByRole("combobox"), "Lasagna");
@@ -222,19 +283,22 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
-    expect(await screen.findByText("Salame")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Mushroom Stew")).toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Salame", "Sandwich", "Mushroom Stew"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
 
     promise.resolve(options);
 
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
-    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
-    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans", "Rice", "Risotto", "Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Salame", "Mushroom Stew"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 
   it("allows no autoloading", async () => {
@@ -251,19 +315,15 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
-    expect(screen.queryByText("Sandwich")).not.toBeInTheDocument();
-    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
-    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
-    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
-    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    expect(await screen.findByText(/No options/i)).toBeInTheDocument();
     
     await userEvent.type(screen.getByRole("combobox"), "i");
     
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans", "Rice", "Risotto", "Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
   });
 
   it("shows defaultOptions", async () => {
@@ -274,9 +334,11 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
-    expect(await screen.findByText("Salame")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Mushroom Stew")).toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Salame", "Sandwich", "Mushroom Stew"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
   });
 
   it("shows options over defaultOptions", async () => {
@@ -287,13 +349,14 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
-    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
-    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans", "Rice", "Risotto", "Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument()
+    ));
+    options
+      .filter(o => ["Salame", "Mushroom Stew"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 
   it("shows defaultOptions while options load", async () => {
@@ -313,23 +376,25 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
-    expect(await screen.findByText("Salame")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Mushroom Stew")).toBeInTheDocument();
-    expect(screen.queryByText("Beans")).not.toBeInTheDocument();
-    expect(screen.queryByText("Rice")).not.toBeInTheDocument();
-    expect(screen.queryByText("Risotto")).not.toBeInTheDocument();
-    expect(screen.queryByText("Donut")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Salame", "Sandwich", "Mushroom Stew"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+    options
+      .filter(o => ["Beans", "Rice", "Risotto", "Donut"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
 
     promise.resolve(options);
     
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
-    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
-    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans", "Rice", "Risotto", "Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+    options
+      .filter(o => ["Salame", "Mushroom Stew"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 
   it("loads options despite default options", async () => {
@@ -345,12 +410,13 @@ describe("select", () => {
     await userEvent.click(screen.getByRole("combobox"));
     
     // Assert
-    expect(await screen.findByText("Risotto")).toBeInTheDocument();
-    expect(await screen.findByText("Sandwich")).toBeInTheDocument();
-    expect(await screen.findByText("Rice")).toBeInTheDocument();
-    expect(await screen.findByText("Beans")).toBeInTheDocument();
-    expect(await screen.findByText("Donut")).toBeInTheDocument();
-    expect(screen.queryByText("Salame")).not.toBeInTheDocument();
-    expect(screen.queryByText("Mushroom Stew")).not.toBeInTheDocument();
+    await Promise.all(
+      options
+        .filter(o => ["Sandwich", "Beans", "Rice", "Risotto", "Donut"].includes(o.label))
+        .map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+    options
+      .filter(o => ["Salame", "Mushroom Stew"].includes(o.label))
+      .map(o => expect(screen.queryByText(o.label)).not.toBeInTheDocument());
   });
 });
