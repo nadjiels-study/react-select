@@ -493,4 +493,158 @@ describe("select", () => {
     // Assert
     expect(await screen.findByText(/No options/i)).toBeInTheDocument();
   });
+
+  it("caches options", async () => {
+    const loadOptions = vi.fn();
+
+    // Arrange
+    render(
+      <Select
+        loadOptions={loadOptions}
+        autoload={false}
+        cacheOptions
+      />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.type(select, "d");
+    await userEvent.clear(select);
+    await userEvent.type(select, "d");
+    
+    // Assert
+    expect(loadOptions).toBeCalledTimes(2);
+  });
+
+  it("ignores cache", async () => {
+    const loadOptions = vi.fn();
+
+    // Arrange
+    render(
+      <Select
+        loadOptions={loadOptions}
+        autoload={false}
+        cacheOptions={false}
+      />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.type(select, "d");
+    await userEvent.clear(select);
+    await userEvent.type(select, "d");
+    
+    // Assert
+    expect(loadOptions).toBeCalledTimes(3);
+  });
+
+  it("removes cache on creation", async () => {
+    const loadOptions = vi.fn().mockResolvedValue([]);
+
+    // Arrange
+    render(
+      <Select
+        loadOptions={loadOptions}
+        uncacheOnCreate
+      />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.type(select, "Rocambolli");
+    await userEvent.click(await screen.findByText(/Create/i));
+
+    loadOptions.mockClear();
+
+    await userEvent.type(select, "Rocambolli");
+    
+    // Assert
+    expect(loadOptions).toBeCalledTimes(10);
+  });
+
+  it("keeps cache on creation", async () => {
+    const loadOptions = vi.fn().mockResolvedValue([]);
+
+    // Arrange
+    render(
+      <Select
+        loadOptions={loadOptions}
+        uncacheOnCreate={false}
+      />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.type(select, "Rocambolli");
+    await userEvent.click(await screen.findByText(/Create/i));
+
+    loadOptions.mockClear();
+
+    await userEvent.type(select, "Rocambolli");
+    
+    // Assert
+    expect(loadOptions).toBeCalledTimes(0);
+  });
+
+  it("allows initial controlled isLoading", async () => {
+    // Arrange
+    render(
+      <Select
+        isLoading
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+    
+    // Assert
+    expect(await screen.findByText("Loading")).toBeInTheDocument();
+  });
+
+  it("allows controlled isLoading", async () => {
+    // Arrange
+    const promise = createPromiseController<DefaultOption[], unknown>();
+    
+    render(
+      <Select<DefaultOption, false, DefaultGroup>
+        loadOptions={
+          () => new Promise((resolve) => promise.resolve = resolve)
+        }
+        isLoading
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+
+    // Act
+    promise.resolve([]);
+    
+    // Assert
+    expect(await screen.findByText("Loading")).toBeInTheDocument();
+  });
+
+  it("allows custom creation", async () => {
+    // Arrange
+    const onCreateOption = vi.fn();
+    
+    render(
+      <Select
+        onCreateOption={onCreateOption}
+      />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.type(select, "Rocambolli");
+    await userEvent.click(await screen.findByText(/Create/i));
+    
+    // Assert
+    expect(onCreateOption).toHaveBeenCalledWith("Rocambolli");
+  });
 });
