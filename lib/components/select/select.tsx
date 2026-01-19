@@ -1,7 +1,7 @@
 "use client";
 
 import CreatableSelect from "react-select/creatable";
-import { useCallback, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import search from "@/lib/util/search";
 
 import { isLabelledOption, type Props } from "./types";
@@ -39,11 +39,10 @@ export default function Select<
     if(autoload) wrapperLoadOptions("");
   }, []);
   
-  const defaultFilterOption = useCallback(
-    (option: FilterOptionOption<Option>, inputValue: string) =>
-      isLabelledOption(option) ? search(option.label, inputValue) : true,
-    [options]
-  );
+  const defaultFilterOption = (
+    option: FilterOptionOption<Option>,
+    inputValue: string
+  ) => isLabelledOption(option) ? search(option.label, inputValue) : true;
 
   const wrapperLoadOptions = (inputValue: string) => {
     if(loadOptions) {
