@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import search from "@/lib/util/search";
 
 import { type Props } from "./types";
-import type { GroupBase, FilterOptionOption, OptionsOrGroups } from "react-select";
+import type { GroupBase, FilterOptionOption, OptionsOrGroups, PropsValue } from "react-select";
 
 /**
  * Allows new option creation when the input
@@ -31,26 +31,53 @@ export default function Select<
   cacheOptions = true,
   uncacheOnCreate = true,
   onCreateOption,
+  loadDefaultValue,
+  defaultValue,
+  value: propValue,
+  onChange,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
   
   const cache = useRef(new Map<string, OptionsOrGroups<Option, Group>>());
+  const wasSelected = useRef(false);
 
   const initialOptions = propOptions?.length ? propOptions : defaultOptions;
+  const initialValue = propValue ?? defaultValue;
 
   const [options, setOptions] = useState(initialOptions);
+  const [value, setValue] = useState(initialValue);
   const [isLoading, setIsLoading] = useState(propIsLoading ?? false);
 
   useEffect(() => {
     if(autoload) wrapperLoadOptions("");
     else if(cacheOptions) cache.current.set("", options ?? []);
+
+    wrapperLoadDefaultValue();
   }, []);
   
   const defaultFilterOption = (
     option: FilterOptionOption<Option>,
     inputValue: string
   ) => search(option.label, inputValue);
+
+  const wrapperLoadDefaultValue = () => {
+    if(!loadDefaultValue || propValue !== undefined) return;
+
+    if(propIsLoading === undefined) setIsLoading(true);
+
+    const updateValue = (value: PropsValue<Option>) => {
+      if(wasSelected.current) return;
+
+      setValue(value);
+    }
+
+    loadDefaultValue(updateValue)
+      ?.then(updateValue)
+      .finally(() => {
+        if(propIsLoading === undefined) setIsLoading(false)
+      });
+  }
 
   const wrapperLoadOptions = (inputValue: string) => {
     if(!loadOptions) return;
@@ -102,6 +129,14 @@ export default function Select<
     onCreateOption?.(inputValue);
   }
 
+  const wrapperOnChange: P["onChange"] = (newValue, actionMeta) => {
+    if(propValue === undefined) setValue(newValue);
+
+    onChange?.(newValue, actionMeta);
+    
+    wasSelected.current = true;
+  }
+
   return <CreatableSelect
     {...props}
     options={options}
@@ -111,5 +146,7 @@ export default function Select<
     isLoading={isLoading}
     onMenuClose={onMenuClose}
     onCreateOption={wrapperOnCreateOption}
+    value={value}
+    onChange={wrapperOnChange}
   />;
 }

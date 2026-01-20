@@ -647,4 +647,70 @@ describe("select", () => {
     // Assert
     expect(onCreateOption).toHaveBeenCalledWith("Rocambolli");
   });
+
+  it("uses controlled value", async () => {
+    // Arrange
+    const value = createOption("Waffles");
+    
+    render(
+      <Select options={options} value={value} />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.click(select);
+    await userEvent.click(await screen.findByText("Beans"));
+    
+    // Assert
+    expect(screen.queryByText("Waffles")).toBeInTheDocument();
+  });
+
+  it("triggers onChange", async () => {
+    // Arrange
+    const onChange = vi.fn();
+    
+    render(
+      <Select options={options} onChange={onChange} />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.click(select);
+    await userEvent.click(await screen.findByText("Beans"));
+    
+    // Assert
+    expect(onChange).toHaveBeenCalledWith(
+      options.find(o => o.label === "Beans"),
+      expect.anything()
+    );
+  });
+
+  it("uses defaultValue", async () => {
+    // Arrange
+    const defaultValue = createOption("Waffles");
+    
+    // Act
+    render(
+      <Select defaultValue={defaultValue} />
+    );
+    
+    // Assert
+    expect(screen.queryByText("Waffles")).toBeInTheDocument();
+  });
+
+  it("loads defaultValue", async () => {
+    // Arrange
+    const loadDefaultValue = () =>
+      Promise.resolve(createOption("Waffles"));
+    
+    // Act
+    render(
+      <Select loadDefaultValue={loadDefaultValue} />
+    );
+    
+    // Assert
+    expect(await screen.findByText("Waffles")).toBeInTheDocument();
+  });
 });

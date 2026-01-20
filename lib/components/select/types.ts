@@ -1,5 +1,5 @@
 import type { CreatableProps } from "react-select/creatable";
-import type { GroupBase, OptionsOrGroups } from "react-select";
+import type { GroupBase, OptionsOrGroups, PropsValue } from "react-select";
 
 type OptionOrGroup<
   Option,
@@ -25,6 +25,10 @@ export type LoadOptions<Option, Group extends GroupBase<Option>> = (
   callback: (options: OptionsOrGroups<Option, Group>) => void,
 ) => void | Promise<OptionsOrGroups<Option, Group>>
 
+export type LoadDefaultValue<Option> = (
+  callback: (value: PropsValue<Option>) => void,
+) => void | Promise<PropsValue<Option>>
+
 export interface Props<
   Option,
   IsMulti extends boolean,
@@ -36,6 +40,7 @@ export interface Props<
   loadOptions?: LoadOptions<Option, Group>;
   cacheOptions?: boolean;
   uncacheOnCreate?: boolean;
+  loadDefaultValue?: LoadDefaultValue<Option>;
 }
 
 export function isLabelledOption<
