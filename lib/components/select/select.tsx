@@ -47,7 +47,8 @@ export default function Select<
 
   const [options, setOptions] = useState(initialOptions);
   const [value, setValue] = useState(initialValue);
-  const [isLoading, setIsLoading] = useState(propIsLoading ?? false);
+  const [isLoadingDefaultValue, setIsLoadingDefaultValue] = useState(false);
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
 
   useEffect(() => {
     if(autoload) wrapperLoadOptions("");
@@ -64,7 +65,7 @@ export default function Select<
   const wrapperLoadDefaultValue = () => {
     if(!loadDefaultValue || propValue !== undefined) return;
 
-    if(propIsLoading === undefined) setIsLoading(true);
+    if(propIsLoading === undefined) setIsLoadingDefaultValue(true);
 
     const updateValue = (value: PropsValue<Option>) => {
       if(wasSelected.current) return;
@@ -75,7 +76,7 @@ export default function Select<
     loadDefaultValue(updateValue)
       ?.then(updateValue)
       .finally(() => {
-        if(propIsLoading === undefined) setIsLoading(false)
+        if(propIsLoading === undefined) setIsLoadingDefaultValue(false)
       });
   }
 
@@ -86,7 +87,7 @@ export default function Select<
       return setOptions(cache.current.get(inputValue));
     }
 
-    if(propIsLoading === undefined) setIsLoading(true);
+    if(propIsLoading === undefined) setIsLoadingOptions(true);
 
     const updateOptions = (options: OptionsOrGroups<Option, Group>) => {
       setOptions(options);
@@ -97,7 +98,7 @@ export default function Select<
     loadOptions(inputValue, updateOptions)
       ?.then(updateOptions)
       .finally(() => {
-        if(propIsLoading === undefined) setIsLoading(false)
+        if(propIsLoading === undefined) setIsLoadingOptions(false)
       });
   }
 
@@ -143,7 +144,7 @@ export default function Select<
     filterOption={filterOption ?? defaultFilterOption}
     isValidNewOption={wrapperIsValidNewOption}
     onInputChange={defaultOnInputChange}
-    isLoading={isLoading}
+    isLoading={propIsLoading ?? (isLoadingOptions || isLoadingDefaultValue)}
     onMenuClose={onMenuClose}
     onCreateOption={wrapperOnCreateOption}
     value={value}
