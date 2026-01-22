@@ -1,0 +1,456 @@
+{
+  "authors": [
+    {
+      "id": 1,
+      "name": "Alice Monroe",
+      "birthDate": "1975-04-12",
+      "deathDate": null,
+      "biography": "Alice Monroe is a celebrated author known for her thrilling adventure novels set in mysterious locations."
+    },
+    {
+      "id": 2,
+      "name": "Brian Carter",
+      "birthDate": "1980-09-23",
+      "deathDate": null,
+      "biography": "Brian Carter writes suspenseful tales often set in small towns, blending mystery and drama."
+    },
+    {
+      "id": 3,
+      "name": "Clara Evans",
+      "birthDate": "1985-02-17",
+      "deathDate": null,
+      "biography": "Clara Evans is acclaimed for her gripping stories of survival and hope."
+    },
+    {
+      "id": 4,
+      "name": "David Lee",
+      "birthDate": "1972-11-05",
+      "deathDate": null,
+      "biography": "David Lee specializes in historical mysteries and stories involving intricate puzzles."
+    },
+    {
+      "id": 5,
+      "name": "Emma Stone",
+      "birthDate": "1978-06-30",
+      "deathDate": null,
+      "biography": "Emma Stone writes heartfelt novels about love, loss, and personal growth."
+    },
+    {
+      "id": 6,
+      "name": "Felix Turner",
+      "birthDate": "1982-01-14",
+      "deathDate": null,
+      "biography": "Felix Turner is known for his epic fantasy adventures featuring dragons and magic."
+    },
+    {
+      "id": 7,
+      "name": "Grace Kim",
+      "birthDate": "1990-03-08",
+      "deathDate": null,
+      "biography": "Grace Kim explores themes of rediscovery and destiny in her novels."
+    },
+    {
+      "id": 8,
+      "name": "Henry Black",
+      "birthDate": "1969-12-21",
+      "deathDate": null,
+      "biography": "Henry Black is a master of ghost stories and supernatural fiction."
+    },
+    {
+      "id": 9,
+      "name": "Isabel Grant",
+      "birthDate": "1987-05-19",
+      "deathDate": null,
+      "biography": "Isabel Grant writes about art, inspiration, and forbidden romance."
+    },
+    {
+      "id": 10,
+      "name": "Jack Morris",
+      "birthDate": "1975-08-02",
+      "deathDate": null,
+      "biography": "Jack Morris is an explorer and author, chronicling tales of courage and discovery."
+    },
+    {
+      "id": 11,
+      "name": "Kara Fields",
+      "birthDate": "1983-10-11",
+      "deathDate": null,
+      "biography": "Kara Fields creates magical worlds filled with secrets and adventure."
+    },
+    {
+      "id": 12,
+      "name": "Liam Scott",
+      "birthDate": "1970-07-27",
+      "deathDate": null,
+      "biography": "Liam Scott writes sweeping family sagas spanning generations."
+    },
+    {
+      "id": 13,
+      "name": "Mia Chen",
+      "birthDate": "1991-04-03",
+      "deathDate": null,
+      "biography": "Mia Chen is known for her dystopian novels and stories of survival."
+    },
+    {
+      "id": 14,
+      "name": "Nathan Brooks",
+      "birthDate": "1979-09-15",
+      "deathDate": null,
+      "biography": "Nathan Brooks is a detective fiction author with a knack for complex cases."
+    },
+    {
+      "id": 15,
+      "name": "Olivia Reed",
+      "birthDate": "1986-12-09",
+      "deathDate": null,
+      "biography": "Olivia Reed writes magical realism novels about growth and healing."
+    },
+    {
+      "id": 16,
+      "name": "Paul Young",
+      "birthDate": "1980-02-25",
+      "deathDate": null,
+      "biography": "Paul Young pens coming-of-age stories set under the stars."
+    },
+    {
+      "id": 17,
+      "name": "Quinn Harper",
+      "birthDate": "1973-05-18",
+      "deathDate": null,
+      "biography": "Quinn Harper specializes in historical thrillers set in Victorian times."
+    },
+    {
+      "id": 18,
+      "name": "Rachel Adams",
+      "birthDate": "1992-11-30",
+      "deathDate": null,
+      "biography": "Rachel Adams writes about the world of ballet and the pursuit of perfection."
+    },
+    {
+      "id": 19,
+      "name": "Samuel Price",
+      "birthDate": "1977-03-22",
+      "deathDate": null,
+      "biography": "Samuel Price is known for his suspenseful adventure novels."
+    },
+    {
+      "id": 20,
+      "name": "Tina Bell",
+      "birthDate": "1984-06-05",
+      "deathDate": null,
+      "biography": "Tina Bell writes romantic comedies about second chances."
+    },
+    {
+      "id": 21,
+      "name": "Uma Patel",
+      "birthDate": "1976-01-29",
+      "deathDate": null,
+      "biography": "Uma Patel weaves interconnected stories about life and fate."
+    },
+    {
+      "id": 22,
+      "name": "Victor Lane",
+      "birthDate": "1968-08-17",
+      "deathDate": null,
+      "biography": "Victor Lane writes nautical adventures and redemption tales."
+    },
+    {
+      "id": 23,
+      "name": "Wendy Fox",
+      "birthDate": "1989-10-13",
+      "deathDate": null,
+      "biography": "Wendy Fox is a fantasy author specializing in royal intrigue."
+    },
+    {
+      "id": 24,
+      "name": "Xander Cole",
+      "birthDate": "1981-12-04",
+      "deathDate": null,
+      "biography": "Xander Cole writes haunting stories about memory and loss."
+    },
+    {
+      "id": 25,
+      "name": "Yara Silva",
+      "birthDate": "1974-03-16",
+      "deathDate": null,
+      "biography": "Yara Silva creates puzzle-filled adventures set in ancient times."
+    },
+    {
+      "id": 26,
+      "name": "Zane Foster",
+      "birthDate": "1988-07-21",
+      "deathDate": null,
+      "biography": "Zane Foster writes about musicians and their emotional journeys."
+    },
+    {
+      "id": 27,
+      "name": "Ava Murphy",
+      "birthDate": "1993-05-12",
+      "deathDate": null,
+      "biography": "Ava Murphy is a travel writer focusing on Ireland's hidden gems."
+    },
+    {
+      "id": 28,
+      "name": "Ben Carter",
+      "birthDate": "1985-09-02",
+      "deathDate": null,
+      "biography": "Ben Carter explores destiny and fate in his novels."
+    },
+    {
+      "id": 29,
+      "name": "Cara Dean",
+      "birthDate": "1979-11-28",
+      "deathDate": null,
+      "biography": "Cara Dean writes about academic rivalries and secrets."
+    },
+    {
+      "id": 30,
+      "name": "Derek Shaw",
+      "birthDate": "1971-02-14",
+      "deathDate": null,
+      "biography": "Derek Shaw is known for his small-town mysteries."
+    }
+  ],
+  "books": [
+    {
+      "id": 1,
+      "name": "The Lost Pages",
+      "description": "A thrilling adventure through forgotten libraries.",
+      "publicationDate": "2010-03-15",
+      "authorId": 1,
+      "rating": 4.2
+    },
+    {
+      "id": 2,
+      "name": "Shadows of Dawn",
+      "description": "A mysterious tale set in a small coastal town.",
+      "publicationDate": "2012-07-21",
+      "authorId": 2,
+      "rating": 3.8
+    },
+    {
+      "id": 3,
+      "name": "Echoes of Silence",
+      "description": "A gripping story of survival and hope.",
+      "publicationDate": "2015-11-10",
+      "authorId": 3,
+      "rating": 4.5
+    },
+    {
+      "id": 4,
+      "name": "The Clockmaker's Secret",
+      "description": "Unraveling mysteries hidden in timepieces.",
+      "publicationDate": "2018-01-05",
+      "authorId": 4,
+      "rating": 4.0
+    },
+    {
+      "id": 5,
+      "name": "Beneath the Willow",
+      "description": "A heartfelt journey of love and loss.",
+      "publicationDate": "2011-09-13",
+      "authorId": 5,
+      "rating": 4.3
+    },
+    {
+      "id": 6,
+      "name": "Crimson Skies",
+      "description": "A fantasy epic of dragons and destiny.",
+      "publicationDate": "2013-04-22",
+      "authorId": 6,
+      "rating": 4.1
+    },
+    {
+      "id": 7,
+      "name": "The Forgotten Path",
+      "description": "Rediscovering the past to save the future.",
+      "publicationDate": "2017-06-30",
+      "authorId": 7,
+      "rating": 3.9
+    },
+    {
+      "id": 8,
+      "name": "Midnight Whispers",
+      "description": "A chilling collection of ghost stories.",
+      "publicationDate": "2014-10-31",
+      "authorId": 8,
+      "rating": 4.4
+    },
+    {
+      "id": 9,
+      "name": "The Painter's Muse",
+      "description": "Art, inspiration, and forbidden romance.",
+      "publicationDate": "2016-02-18",
+      "authorId": 9,
+      "rating": 4.0
+    },
+    {
+      "id": 10,
+      "name": "Journey to the North",
+      "description": "An explorer's tale of courage and discovery.",
+      "publicationDate": "2019-08-12",
+      "authorId": 10,
+      "rating": 4.6
+    },
+    {
+      "id": 11,
+      "name": "The Silver Key",
+      "description": "Unlocking secrets in a magical world.",
+      "publicationDate": "2012-05-09",
+      "authorId": 11,
+      "rating": 3.7
+    },
+    {
+      "id": 12,
+      "name": "Winds of Change",
+      "description": "A family saga spanning generations.",
+      "publicationDate": "2010-12-01",
+      "authorId": 12,
+      "rating": 4.2
+    },
+    {
+      "id": 13,
+      "name": "The Last Ember",
+      "description": "A dystopian fight for survival.",
+      "publicationDate": "2013-03-27",
+      "authorId": 13,
+      "rating": 4.1
+    },
+    {
+      "id": 14,
+      "name": "Hidden in Plain Sight",
+      "description": "A detective unravels a complex case.",
+      "publicationDate": "2015-07-14",
+      "authorId": 14,
+      "rating": 3.8
+    },
+    {
+      "id": 15,
+      "name": "The Glass Garden",
+      "description": "A magical realism novel of growth and healing.",
+      "publicationDate": "2018-11-23",
+      "authorId": 15,
+      "rating": 4.5
+    },
+    {
+      "id": 16,
+      "name": "Starlit Dreams",
+      "description": "A coming-of-age story under the night sky.",
+      "publicationDate": "2011-06-17",
+      "authorId": 16,
+      "rating": 4.0
+    },
+    {
+      "id": 17,
+      "name": "The Iron Gate",
+      "description": "A historical thriller set in Victorian London.",
+      "publicationDate": "2014-09-29",
+      "authorId": 17,
+      "rating": 4.3
+    },
+    {
+      "id": 18,
+      "name": "Dancing Shadows",
+      "description": "A ballet dancer's struggle for perfection.",
+      "publicationDate": "2016-12-05",
+      "authorId": 18,
+      "rating": 3.9
+    },
+    {
+      "id": 19,
+      "name": "The Silent River",
+      "description": "A suspenseful journey down a dangerous river.",
+      "publicationDate": "2019-03-11",
+      "authorId": 19,
+      "rating": 4.4
+    },
+    {
+      "id": 20,
+      "name": "Paper Hearts",
+      "description": "A romantic comedy about second chances.",
+      "publicationDate": "2012-08-20",
+      "authorId": 20,
+      "rating": 4.1
+    },
+    {
+      "id": 21,
+      "name": "The Golden Thread",
+      "description": "A tapestry of interconnected lives.",
+      "publicationDate": "2010-04-16",
+      "authorId": 21,
+      "rating": 4.2
+    },
+    {
+      "id": 22,
+      "name": "Broken Compass",
+      "description": "A sailor's quest for redemption.",
+      "publicationDate": "2013-11-02",
+      "authorId": 22,
+      "rating": 3.8
+    },
+    {
+      "id": 23,
+      "name": "The Sapphire Crown",
+      "description": "A royal intrigue in a fantasy kingdom.",
+      "publicationDate": "2015-02-28",
+      "authorId": 23,
+      "rating": 4.0
+    },
+    {
+      "id": 24,
+      "name": "Fading Echoes",
+      "description": "A haunting story of memory and loss.",
+      "publicationDate": "2018-07-19",
+      "authorId": 24,
+      "rating": 4.3
+    },
+    {
+      "id": 25,
+      "name": "The Alchemist's Code",
+      "description": "A puzzle-filled adventure in ancient times.",
+      "publicationDate": "2011-10-25",
+      "authorId": 25,
+      "rating": 4.1
+    },
+    {
+      "id": 26,
+      "name": "Moonlit Sonata",
+      "description": "A musician's journey through heartbreak.",
+      "publicationDate": "2014-01-13",
+      "authorId": 26,
+      "rating": 3.9
+    },
+    {
+      "id": 27,
+      "name": "The Emerald Isle",
+      "description": "A travelogue of Ireland's hidden gems.",
+      "publicationDate": "2016-05-07",
+      "authorId": 27,
+      "rating": 4.4
+    },
+    {
+      "id": 28,
+      "name": "Threads of Fate",
+      "description": "Destiny weaves its web in unexpected ways.",
+      "publicationDate": "2019-09-15",
+      "authorId": 28,
+      "rating": 4.0
+    },
+    {
+      "id": 29,
+      "name": "The Ivory Tower",
+      "description": "Academic rivalries and dark secrets.",
+      "publicationDate": "2012-03-19",
+      "authorId": 29,
+      "rating": 4.2
+    },
+    {
+      "id": 30,
+      "name": "Whispering Pines",
+      "description": "A small town with big mysteries.",
+      "publicationDate": "2010-07-28",
+      "authorId": 30,
+      "rating": 3.7
+    }
+  ]
+}
