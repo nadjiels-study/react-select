@@ -3,9 +3,15 @@
 import ReactSelect from "react-select";
 import Select from "@/lib/components/select";
 import authors from "@/api/authors";
+import { createOption } from "@/lib/components/select/lib";
+import type { Author } from "@/api/types";
 
 async function loadAuthors() {
   return authors.getAll().then(res => res.data);
+}
+
+function authorToOption(author: Author) {
+  return createOption(author.name, author.id.toString());
 }
 
 export default function BooksCreate() {
@@ -38,7 +44,8 @@ export default function BooksCreate() {
         <Select
           inputId="authorId"
           name="authorId"
-          loadOptions={loadAuthors}
+          loadOptions={() => loadAuthors().then(res => res.map(authorToOption))}
+          className="text-black"
         />
       </div>
       <div className="flex flex-col">
