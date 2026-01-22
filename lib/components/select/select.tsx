@@ -15,6 +15,13 @@ function defaultIsValidNewOption(inputValue: string) {
   return inputValue.trim().length > 0;
 }
 
+/**
+ * A wrapper around {@link CreatableSelect react-select}'s `CreatableSelect`
+ * component that adds async features and easier integration with
+ * form libraries.
+ * 
+ * - Note: apparently, the options have to follow a `{ label, value }` shape.
+ */
 export default function Select<
   Option,
   IsMulti extends boolean,
