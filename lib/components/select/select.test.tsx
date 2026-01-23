@@ -571,7 +571,7 @@ describe("select", () => {
     await userEvent.type(select, "Rocambolli");
     
     // Assert
-    expect(loadOptions).toBeCalledTimes(10);
+    expect(loadOptions).toBeCalledTimes(11);
   });
 
   it("keeps cache on creation", async () => {
@@ -750,5 +750,46 @@ describe("select", () => {
     await waitForElementToBeRemoved(loadingIndicator);
 
     expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+  });
+
+  it("keeps options on reopening", async () => {
+    // Arrange
+    render(
+      <Select
+        loadOptions={() => Promise.resolve(options)}
+      />
+    );
+
+    const select = screen.getByRole("combobox");
+
+    // Act
+    await userEvent.click(select);
+
+    // Assert
+    await Promise.all(
+      options.map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+
+    await userEvent.click(document.body);
+    await userEvent.click(select);
+
+    await Promise.all(
+      options.map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+  });
+
+  it("executes onMenuOpen", async () => {
+    // Arrange
+    const onMenuOpen = vi.fn();
+
+    render(
+      <Select onMenuOpen={onMenuOpen} />
+    );
+
+    // Act
+    await userEvent.click(screen.getByRole("combobox"));
+
+    // Assert
+    expect(onMenuOpen).toHaveBeenCalled();
   });
 });

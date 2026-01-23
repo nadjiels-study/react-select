@@ -42,6 +42,7 @@ export default function Select<
   defaultValue,
   value: propValue,
   onChange,
+  onMenuOpen,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
@@ -126,9 +127,13 @@ export default function Select<
       isValidNewOption?.(inputValue, value, options, accessors)
       ?? defaultIsValidNewOption(inputValue)
     );
-  
-  const onMenuClose = () => {
+
+  const wrapperOnMenuOpen = () => {
     setOptions(initialOptions);
+
+    if(autoload) wrapperLoadOptions("");
+
+    onMenuOpen?.();
   }
 
   const wrapperOnCreateOption = (inputValue: string) => {
@@ -152,7 +157,7 @@ export default function Select<
     isValidNewOption={wrapperIsValidNewOption}
     onInputChange={defaultOnInputChange}
     isLoading={propIsLoading ?? (isLoadingOptions || isLoadingDefaultValue)}
-    onMenuClose={onMenuClose}
+    onMenuOpen={wrapperOnMenuOpen}
     onCreateOption={wrapperOnCreateOption}
     value={value}
     onChange={wrapperOnChange}
