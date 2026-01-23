@@ -4,7 +4,7 @@ import ReactSelect from "react-select";
 import Select from "@/lib/components/select";
 import authors from "@/api/authors";
 import { createOption } from "@/lib/components/select/lib";
-import type { Author } from "@/api/types";
+import type { Author } from "@/api/lib/types";
 
 async function loadAuthors() {
   return authors.getAll().then(res => res.data);
