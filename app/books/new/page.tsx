@@ -2,12 +2,22 @@
 
 import ReactSelect from "react-select";
 import Select from "@/lib/components/select";
+import { delay } from "@/lib/util";
 import authors from "@/api/authors";
 import { createOption } from "@/lib/components/select/lib";
-import type { Author } from "@/api/lib/types";
+import type { Author } from "@/api/authors/types";
 
-async function loadAuthors() {
-  return authors.getAll().then(res => res.data);
+async function loadAuthors(inputValue: string) {
+  return delay(authors.getAll({
+    search: inputValue,
+    sort: { name: 1 },
+  }), 3000).then(res => res.data);
+}
+
+async function createAuthor(inputValue: string) {
+  return delay(authors.create({
+    name: inputValue
+  }), 3000).then(res => res.data);
 }
 
 function authorToOption(author: Author) {
@@ -44,7 +54,8 @@ export default function BooksCreate() {
         <Select
           inputId="authorId"
           name="authorId"
-          loadOptions={() => loadAuthors().then(res => res.map(authorToOption))}
+          loadOptions={inputValue => loadAuthors(inputValue).then(res => res.map(authorToOption))}
+          onCreateOption={createAuthor}
           className="text-black"
         />
       </div>
