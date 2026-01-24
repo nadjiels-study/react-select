@@ -57,6 +57,7 @@ export default function Select<
   const [value, setValue] = useState(initialValue);
   const [isLoadingDefaultValue, setIsLoadingDefaultValue] = useState(false);
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  const [isCreatingOption, setIsCreatingOption] = useState(false);
 
   useEffect(() => {
     if(autoload) wrapperLoadOptions("");
@@ -136,10 +137,14 @@ export default function Select<
     onMenuOpen?.();
   }
 
-  const wrapperOnCreateOption = (inputValue: string) => {
+  const wrapperOnCreateOption = async (inputValue: string) => {
     if(uncacheOnCreate) cache.current.clear();
 
-    onCreateOption?.(inputValue);
+    if(propIsLoading === undefined) setIsCreatingOption(true);
+
+    await onCreateOption?.(inputValue);
+    
+    if(propIsLoading === undefined) setIsCreatingOption(false);
   }
 
   const wrapperOnChange: P["onChange"] = (newValue, actionMeta) => {
@@ -156,7 +161,7 @@ export default function Select<
     filterOption={filterOption ?? defaultFilterOption}
     isValidNewOption={wrapperIsValidNewOption}
     onInputChange={defaultOnInputChange}
-    isLoading={propIsLoading ?? (isLoadingOptions || isLoadingDefaultValue)}
+    isLoading={propIsLoading ?? (isLoadingOptions || isLoadingDefaultValue || isCreatingOption)}
     onMenuOpen={wrapperOnMenuOpen}
     onCreateOption={wrapperOnCreateOption}
     value={value}

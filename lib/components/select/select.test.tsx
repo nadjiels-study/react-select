@@ -792,4 +792,32 @@ describe("select", () => {
     // Assert
     expect(onMenuOpen).toHaveBeenCalled();
   });
+
+  it("loads while creating", async () => {
+    // Arrange
+    const promise = createPromiseController<void, unknown>();
+
+    render(
+      <Select
+        onCreateOption={() => promise.commit()}
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+
+    // Act
+    await userEvent.type(screen.getByRole("combobox"), "Lasagnna");
+    await userEvent.click(await screen.findByText(/Create/));
+
+    // Assert
+    const loadingIndicator = await screen.findByText("Loading");
+    expect(loadingIndicator).toBeInTheDocument();
+
+    promise.resolve();
+
+    await waitForElementToBeRemoved(loadingIndicator);
+
+    expect(loadingIndicator).not.toBeInTheDocument();
+  });
 });

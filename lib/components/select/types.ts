@@ -29,6 +29,8 @@ export type LoadDefaultValue<Option> = (
   callback: (value: PropsValue<Option>) => void,
 ) => void | Promise<PropsValue<Option>>
 
+export type OnCreateOption = (inputValue: string) => void | Promise<void>;
+
 export interface Props<
   Option,
   IsMulti extends boolean,
@@ -41,6 +43,7 @@ export interface Props<
   cacheOptions?: boolean;
   uncacheOnCreate?: boolean;
   loadDefaultValue?: LoadDefaultValue<Option>;
+  onCreateOption?: OnCreateOption;
 }
 
 export function isLabelledOption<
