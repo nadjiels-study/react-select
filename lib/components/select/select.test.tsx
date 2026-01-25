@@ -691,6 +691,25 @@ describe("select", () => {
     expect(await screen.findByText("Crackers")).toBeInTheDocument();
   });
 
+  it("updates controlled options", async () => {
+    // Arrange
+    const { rerender } = render(<Select options={options} />);
+
+    await userEvent.click(screen.getByRole("combobox"));
+
+    // Act
+    await Promise.all(
+      options.map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+
+    rerender(<Select options={defaultOptions} />);
+    
+    // Assert
+    await Promise.all(
+      defaultOptions.map(async o => expect(await screen.findByText(o.label)).toBeInTheDocument())
+    );
+  });
+
   it("triggers onChange", async () => {
     // Arrange
     const onChange = vi.fn();
