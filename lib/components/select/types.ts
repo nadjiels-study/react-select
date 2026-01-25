@@ -42,7 +42,7 @@ export interface Props<
   Option,
   IsMulti extends boolean,
   Group extends GroupBase<Option>,
-> extends CreatableSelectProps<Option, IsMulti, Group> {
+> extends Omit<CreatableSelectProps<Option, IsMulti, Group>, "isDisabled"> {
   creatable?: boolean;
   defaultOptions?: OptionsOrGroups<Option, Group>;
   autoload?: boolean;
@@ -51,6 +51,7 @@ export interface Props<
   uncacheOnCreate?: boolean;
   loadDefaultValue?: LoadDefaultValue<Option>;
   onCreateOption?: OnCreateOption;
+  disabled?: boolean;
 }
 
 export function isLabelledOption<

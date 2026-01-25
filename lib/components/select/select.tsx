@@ -43,6 +43,7 @@ export default function Select<
   value: propValue,
   onChange,
   onMenuOpen,
+  disabled,
   ...props
 }: Props<Option, IsMulti, Group>) {
   type P = Props<Option, IsMulti, Group>;
@@ -172,5 +173,6 @@ export default function Select<
     onCreateOption={wrapperOnCreateOption}
     value={value}
     onChange={wrapperOnChange}
+    isDisabled={disabled}
   />;
 }
