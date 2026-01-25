@@ -53,13 +53,17 @@ export default function Select<
   const initialOptions = propOptions?.length ? propOptions : defaultOptions;
   const initialValue = propValue ?? defaultValue;
 
-  const [options, setOptions] = useState(initialOptions);
+  const [internalOptions, setInternalOptions] = useState(initialOptions);
   const [internalValue, setInternalValue] = useState(initialValue);
   const [isLoadingDefaultValue, setIsLoadingDefaultValue] = useState(false);
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const [isCreatingOption, setIsCreatingOption] = useState(false);
 
   const value = propValue !== undefined ? propValue : internalValue;
+  const options = propOptions !== undefined ? propOptions : internalOptions;
+  const isLoading = propIsLoading !== undefined
+    ? propIsLoading
+    : isLoadingOptions || isLoadingDefaultValue || isCreatingOption;
 
   useEffect(() => {
     if(autoload) wrapperLoadOptions("");
@@ -95,13 +99,13 @@ export default function Select<
     if(!loadOptions) return;
 
     if(cacheOptions && cache.current.has(inputValue)) {
-      return setOptions(cache.current.get(inputValue));
+      return setInternalOptions(cache.current.get(inputValue));
     }
 
     if(propIsLoading === undefined) setIsLoadingOptions(true);
 
     const updateOptions = (options: OptionsOrGroups<Option, Group>) => {
-      setOptions(options);
+      setInternalOptions(options);
 
       if(cacheOptions) cache.current.set(inputValue, options);
     }
@@ -132,7 +136,7 @@ export default function Select<
     );
 
   const wrapperOnMenuOpen = () => {
-    setOptions(initialOptions);
+    setInternalOptions(initialOptions);
 
     if(autoload) wrapperLoadOptions("");
 
@@ -163,7 +167,7 @@ export default function Select<
     filterOption={filterOption ?? defaultFilterOption}
     isValidNewOption={wrapperIsValidNewOption}
     onInputChange={defaultOnInputChange}
-    isLoading={propIsLoading ?? (isLoadingOptions || isLoadingDefaultValue || isCreatingOption)}
+    isLoading={isLoading}
     onMenuOpen={wrapperOnMenuOpen}
     onCreateOption={wrapperOnCreateOption}
     value={value}
