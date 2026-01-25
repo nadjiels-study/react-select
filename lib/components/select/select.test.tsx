@@ -673,6 +673,24 @@ describe("select", () => {
     expect(screen.queryByText("Waffles")).toBeInTheDocument();
   });
 
+  it("updates controlled value", async () => {
+    // Arrange
+    const valueWaffles = createOption("Waffles");
+    const valueCrackers = createOption("Crackers");
+    
+    const { rerender } = render(
+      <Select options={options} value={valueWaffles} />
+    );
+
+    // Act
+    expect(screen.queryByText("Waffles")).toBeInTheDocument();
+
+    rerender(<Select options={options} value={valueCrackers} />)
+    
+    // Assert
+    expect(await screen.findByText("Crackers")).toBeInTheDocument();
+  });
+
   it("triggers onChange", async () => {
     // Arrange
     const onChange = vi.fn();
