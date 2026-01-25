@@ -54,10 +54,12 @@ export default function Select<
   const initialValue = propValue ?? defaultValue;
 
   const [options, setOptions] = useState(initialOptions);
-  const [value, setValue] = useState(initialValue);
+  const [internalValue, setInternalValue] = useState(initialValue);
   const [isLoadingDefaultValue, setIsLoadingDefaultValue] = useState(false);
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const [isCreatingOption, setIsCreatingOption] = useState(false);
+
+  const value = propValue !== undefined ? propValue : internalValue;
 
   useEffect(() => {
     if(autoload) wrapperLoadOptions("");
@@ -79,7 +81,7 @@ export default function Select<
     const updateValue = (value: PropsValue<Option>) => {
       if(wasSelected.current) return;
 
-      setValue(value);
+      setInternalValue(value);
     }
 
     loadDefaultValue(updateValue)
@@ -148,7 +150,7 @@ export default function Select<
   }
 
   const wrapperOnChange: P["onChange"] = (newValue, actionMeta) => {
-    if(propValue === undefined) setValue(newValue);
+    if(propValue === undefined) setInternalValue(newValue);
 
     onChange?.(newValue, actionMeta);
     
