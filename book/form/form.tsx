@@ -3,7 +3,7 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "@/lib/components/select";
-import { loadAuthors, authorToOption, createAuthor, defaultValues, loadAuthor } from "./lib";
+import { loadAuthors, authorToOption, createAuthor, loadAuthor } from "./lib";
 import Schema from "./schema";
 import type { Props, SchemaInput, SchemaOutput } from "./types";
 import type { DefaultGroup, DefaultOption } from "@/lib/components/select/types";
