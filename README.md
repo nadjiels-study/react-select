@@ -4,6 +4,8 @@
 - Debounce search
 - Add autoload "onRender" or "onOpen"
 - Add boilerplate rhf controlled select
+- Multiple options tests
+- Cancel default value loading once value is set
 
 ## Improvements
 
