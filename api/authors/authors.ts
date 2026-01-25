@@ -3,6 +3,10 @@ import createQuery from "@/api/lib/create-query";
 import type { Author, CreateAuthorData } from "./types";
 import type { BulkParams } from "@/api/lib/create-query/types";
 
+export function get(id: string) {
+  return api.get<Author>(`authors/${id}`);
+}
+
 export function getAll(params?: BulkParams<Author>) {
   const query = params ? createQuery(params) : "";
   
