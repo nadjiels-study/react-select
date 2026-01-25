@@ -1,5 +1,12 @@
-import type { CreatableProps } from "react-select/creatable";
+import { ComponentProps } from "react";
 import type { GroupBase, OptionsOrGroups, PropsValue } from "react-select";
+import CreatableSelect from "react-select/creatable";
+
+type CreatableSelectProps<
+  Option,
+  IsMulti extends boolean,
+  Group extends GroupBase<Option>,
+> = ComponentProps<typeof CreatableSelect<Option, IsMulti, Group>>;
 
 type OptionOrGroup<
   Option,
@@ -35,7 +42,7 @@ export interface Props<
   Option,
   IsMulti extends boolean,
   Group extends GroupBase<Option>,
-> extends CreatableProps<Option, IsMulti, Group> {
+> extends CreatableSelectProps<Option, IsMulti, Group> {
   creatable?: boolean;
   defaultOptions?: OptionsOrGroups<Option, Group>;
   autoload?: boolean;
