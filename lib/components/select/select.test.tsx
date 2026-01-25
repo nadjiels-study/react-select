@@ -857,4 +857,14 @@ describe("select", () => {
 
     expect(loadingIndicator).not.toBeInTheDocument();
   });
+
+  it("is disabled", async () => {
+    // Arrange
+    render(<Select disabled />);
+
+    const select = screen.getByRole("combobox", { hidden: true });
+    
+    // Assert
+    expect(select).toBeDisabled();
+  });
 });
