@@ -45,7 +45,7 @@ export interface Props<
 > extends Omit<CreatableSelectProps<Option, IsMulti, Group>, "isDisabled"> {
   creatable?: boolean;
   defaultOptions?: OptionsOrGroups<Option, Group>;
-  autoload?: boolean;
+  autoload?: boolean | "onRender" | "onOpen";
   loadOptions?: LoadOptions<Option, Group>;
   cacheOptions?: boolean;
   uncacheOnCreate?: boolean;

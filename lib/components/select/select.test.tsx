@@ -867,4 +867,73 @@ describe("select", () => {
     // Assert
     expect(select).toBeDisabled();
   });
+
+  it("loads on render", async () => {
+    // Arrange
+    const promise = createPromiseController<DefaultOption[], unknown>();
+
+    // Act
+    render(
+      <Select
+        autoload="onRender"
+        loadOptions={() => promise.commit()}
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+
+    // Assert
+    expect(await screen.findByText("Loading")).toBeInTheDocument();
+
+    promise.resolve(options);
+  });
+
+  it("loads only on open", async () => {
+    // Arrange
+    const promise = createPromiseController<DefaultOption[], unknown>();
+
+    // Act
+    render(
+      <Select
+        autoload="onOpen"
+        loadOptions={() => promise.commit()}
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+
+    // Assert
+    expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("combobox"));
+
+    expect(await screen.findByText("Loading")).toBeInTheDocument();
+
+    promise.resolve([]);
+  });
+
+  it("loads on open", async () => {
+    // Arrange
+    const promise = createPromiseController<DefaultOption[], unknown>();
+
+    // Act
+    render(
+      <Select
+        autoload="onOpen"
+        loadOptions={() => promise.commit()}
+        components={{
+          LoadingIndicator: () => <span>Loading</span>
+        }}
+      />
+    );
+
+    await userEvent.click(screen.getByRole("combobox"));
+
+    // Assert
+    expect(await screen.findByText("Loading")).toBeInTheDocument();
+
+    promise.resolve(options);
+  });
 });

@@ -32,7 +32,7 @@ export default function Select<
   defaultOptions,
   isValidNewOption,
   loadOptions,
-  autoload = true,
+  autoload = "onRender",
   filterOption,
   isLoading: propIsLoading,
   cacheOptions = true,
@@ -67,7 +67,8 @@ export default function Select<
     : isLoadingOptions || isLoadingDefaultValue || isCreatingOption;
 
   useEffect(() => {
-    if(autoload) wrapperLoadOptions("");
+    if(autoload === "onOpen") {}
+    else if(autoload) wrapperLoadOptions("");
     else if(cacheOptions) cache.current.set("", options ?? []);
 
     wrapperLoadDefaultValue();
